@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ganesha Name Art Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🙏 Ganesha Name Art Generator</h1>
+    <input type="text" id="nameInput" placeholder="Enter a name" />
+    <h2>Select a Style</h2>
+    <div class="styles">
+      <img src="images/style1.png" onclick="selectStyle(this)" class="style-option">
+      <img src="images/style2.png" onclick="selectStyle(this)" class="style-option">
+      <img src="images/style3.png" onclick="selectStyle(this)" class="style-option">
+    </div>
+    <button onclick="generateArt()">✨ Generate</button>
+    <div id="result"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
