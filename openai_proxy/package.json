@@ -1,0 +1,5 @@
+{
+    "name": "openai-proxy",
+    "version": "1.0.0",
+    "main": "api/generate.js"
+  }
