@@ -43,7 +43,7 @@ async function generateArt() {
         model: "gpt-image-1", // Correctly using your desired model
         prompt: prompt,
         size: "1024x1024",
-        quality: "hd" // Requesting high quality, which gpt-image-1 excels at
+        quality: "medium" // Requesting high quality, which gpt-image-1 excels at
         // 'image' parameter is removed to fix the error
       })
     });
