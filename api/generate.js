@@ -1,48 +1,60 @@
-import { formidable } from 'formidable';
-import fs from 'fs';
-import FormData from 'form-data';
-import fetch from 'node-fetch';
+const formidable = require('formidable');
+const fs = require('fs');
+const FormData = require('form-data');
+const fetch = require('node-fetch');
 
 // Disable Vercel's default body parser
-export const config = {
+module.exports.config = {
   api: {
     bodyParser: false,
   },
 };
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    const form = formidable({});
-    const [fields, files] = await form.parse(req);
+  const form = formidable();
 
-    const promptText = fields.prompt[0];
-    const imageFile = files.image[0];
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error('Error parsing form:', err);
+      return res.status(500).json({ error: 'Error processing upload' });
+    }
 
-    const formData = new FormData();
-    formData.append('prompt', promptText);
-    formData.append('model', 'gpt-image-1');
-    formData.append('image', fs.createReadStream(imageFile.filepath), imageFile.originalFilename);
-    // Explicitly request the b64_json format
-    formData.append('response_format', 'b64_json'); 
+    try {
+      const promptText = fields.prompt;
+      const imageFile = files.image;
 
-    const response = await fetch("https://api.openai.com/v1/images/edits", {
-      method: 'POST',
-      headers: {
-        ...formData.getHeaders(),
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: formData,
-    });
-    
-    const data = await response.json();
-    return res.status(response.status).json(data);
+      const formData = new FormData();
+      formData.append('prompt', promptText);
+      formData.append('model', 'gpt-image-1');
+      formData.append('image', fs.createReadStream(imageFile.filepath), imageFile.originalFilename);
+      formData.append('response_format', 'b64_json'); // We want the image data directly
 
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Internal Server Error', details: err.message });
-  }
-}
+      const openAIResponse = await fetch("https://api.openai.com/v1/images/edits", {
+        method: 'POST',
+        headers: {
+          ...formData.getHeaders(),
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: formData,
+      });
+
+      const data = await openAIResponse.json();
+
+      if (!openAIResponse.ok) {
+        // If OpenAI returned an error, forward it
+        console.error('OpenAI API Error:', data);
+        return res.status(openAIResponse.status).json(data);
+      }
+      
+      return res.status(200).json(data);
+
+    } catch (error) {
+      console.error('Internal Server Error:', error);
+      return res.status(500).json({ error: 'Failed to call OpenAI API' });
+    }
+  });
+};
