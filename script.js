@@ -30,17 +30,19 @@ async function generateArt() {
     const prompt = `Create a vibrant artistic depiction of Lord Ganesha in the style of the reference image, beautifully integrating the name '${name}' into the design, with festive colors and ornate spiritual symbolism.`;
 
     try {
-      const res = await fetch("https://api.openai.com/v1/images/generations", {
+      // Update this fetch call to your Vercel API endpoint
+      const res = await fetch("/api/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer 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"
         },
         body: JSON.stringify({
-          model: "gpt-image-1",
+          model: "gpt-image-1", // It's better to use a more modern model
           prompt: prompt,
           size: "1024x1024",
-          image: [base64data]
+          // The image parameter is not supported in the way you are using it.
+          // Instead, we will pass the base64 data and handle it on the backend.
+          image: base64data
         })
       });
 
